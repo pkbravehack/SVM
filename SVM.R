@@ -28,6 +28,7 @@
       a=match(y,colnames(dataset))
       df_scale=as.data.frame(scale(dataset[,-a]))
       df_scale[,y]=dataset[,y]
+      names(df_scale)[names(df_scale)==y]<-"class"
       return (df_scale)
    }
    
@@ -54,6 +55,17 @@
    }
    
    
+   #train and test svm
+   tune_svm<-function(train, test,cost=c(0.001,	0.01,	0.1,	1,5,10)){
+      line_tune<-tune.svm(class~.,data=train,kernel="linear",cost=cost)
+      best.linear	=	line_tune$best.model
+      tune.test	=	predict(best.linear,	newdata=test)
+      print(table(tune.test,	test$class)	)
+      mean=mean(tune.test==test$class)
+      cat("\nMean of predicted values: ", mean)
+   }
+   
+   
    #################################################################################################################33
    
    #############################
@@ -62,10 +74,10 @@
    
    ### data
    link<-"https://archive.ics.uci.edu/ml/machine-learning-databases/00267/data_banknote_authentication.txt"
-   df<-read.table(link,header = FALSE, sep = ",",dec = ".",col.names=c("variance","skewness","curtosis","entropy","class"))
-   
-   ### scale data, factorize y
-   df_scale<-scaled(df,"class")
+   df<-read.table(link,header = FALSE, sep = ",",dec = ".",col.names=c("variance","skewness","curtosis","entropy","y"))
+
+   ### scale data, factorize y; rename y as "class"
+   df_scale<-scaled(df,"y")
    
    ### plot data
    plots(df_scale,"class")
@@ -77,24 +89,4 @@
    #############################
    # SVM performance
    #############################
-   # line_tune<-tune.svm(class~.,data=t$train,kernel="linear",cost=c(0.001,	0.01,	0.1,	1,5,10))
-   # summary(line_tune)
-   # # I will precise C
-   # line_tune2<-tune.svm(class~.,data=t$train,kernel="linear",cost=c(1,2,3,4,5,6,7,8))
-   # summary(line_tune2)
-   # best.linear	=	line_tune2$best.model
-   # tune.test	=	predict(best.linear,	newdata=t$test)
-   # table(tune.test,	t$test$class)	
-   # mean(tune.test==t$test$class) 
-   
-   tune_svm<-function(train, test,y_col,cost=c(0.001,	0.01,	0.1,	1,5,10)){
-      line_tune<-tune.svm(class~.,data=train,kernel="linear",cost=cost)
-      best.linear	=	line_tune$best.model
-      tune.test	=	predict(best.linear,	newdata=test)
-      print(table(tune.test,	test$class)	)
-      mean=mean(tune.test==test$class)
-      cat("\nMean of predicted values: ", mean)
-   }
-   
-   tune_svm(t$train,t$test,5)
-   
+   tune_svm(t$train,t$test)
