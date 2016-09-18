@@ -55,16 +55,34 @@
    }
    
    
-   #train and test svm
+   # svm - linear
    tune_svm<-function(train, test,cost=c(0.001,	0.01,	0.1,	1,5,10)){
-      line_tune<-tune.svm(class~.,data=train,kernel="linear",cost=cost)
-      best.linear	=	line_tune$best.model
+      best.linear<-best.svm(class~.,data=train,kernel="linear",cost=cost)
       tune.test	=	predict(best.linear,	newdata=test)
       print(table(tune.test,	test$class)	)
       mean=mean(tune.test==test$class)
       cat("\nMean of predicted values: ", mean)
    }
    
+   
+   # svm - polynomial
+   poly_svm<-function(train, test,coefficients=c(0.1,0.5,1,2,3,4),dgr=c(3,4,5)){
+      best.poly<-best.svm(class~.,data=train,kernel="polynomial",coef0 = coefficients,degree=dgr)
+      poly.test	=	predict(best.poly,	newdata=test)
+      print(table(poly.test,	test$class)	)
+      mean=mean(poly.test==test$class)
+      cat("\nMean of predicted values: ", mean)
+   }
+   
+   
+   # svm - radial function
+   rad_svm<-function(train, test,gam=c(0.1,0.5,1,2,3,4)){
+      best.rad<-best.svm(class~.,data=train,kernel="radial",gamma=gam)
+      rad.test	=	predict(best.rad,	newdata=test)
+      print(table(rad.test,	test$class)	)
+      mean=mean(rad.test==test$class)
+      cat("\nMean of predicted values: ", mean)
+   }
    
    #################################################################################################################33
    
@@ -89,4 +107,14 @@
    #############################
    # SVM performance
    #############################
+   
+   # linear function
    tune_svm(t$train,t$test)
+   
+   #polynomial function.
+   poly_svm(t$train,t$test)
+   
+   # radial function
+   rad_svm(t$train,t$test)
+
+   
