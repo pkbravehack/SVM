@@ -57,6 +57,7 @@
    
    # svm - linear
    tune_svm<-function(train, test,cost=c(0.001,	0.01,	0.1,	1,5,10)){
+      set.seed(123)
       best.linear<-best.svm(class~.,data=train,kernel="linear",cost=cost)
       tune.test	=	predict(best.linear,	newdata=test)
       print(table(tune.test,	test$class)	)
@@ -67,6 +68,7 @@
    
    # svm - polynomial
    poly_svm<-function(train, test,coefficients=c(0.1,0.5,1,2,3,4),dgr=c(3,4,5)){
+      set.seed(123)
       best.poly<-best.svm(class~.,data=train,kernel="polynomial",coef0 = coefficients,degree=dgr)
       poly.test	=	predict(best.poly,	newdata=test)
       print(table(poly.test,	test$class)	)
@@ -75,12 +77,25 @@
    }
    
    
-   # svm - radial function
+   # svm - gaussian (RBF)
    rad_svm<-function(train, test,gam=c(0.1,0.5,1,2,3,4)){
-      best.rad<-best.svm(class~.,data=train,kernel="radial",gamma=gam)
+      set.seed(123)
+      best.rad<-best.svm(class~.,data=train,kernel="radial",gamma=gam) #gamma parameter,not function
       rad.test	=	predict(best.rad,	newdata=test)
       print(table(rad.test,	test$class)	)
       mean=mean(rad.test==test$class)
+      cat("\nMean of predicted values: ", mean)
+   }
+   
+   
+   # svm - sigmoid function.
+      # SVM model using a sigmoid kernel function is equivalent to a two-layer, perceptron neural network.
+   sigmoid_svm<-function(train, test,gam=c(0.1,0.5,1,2,3,4),coef=c(0.1,0.5,1,2,3,4)){
+      set.seed(123)
+      best.sigm<-best.svm(class~.,data=train,kernel="sigmoid",gamma=gam,coef0=coef) 
+      sigm.test	=	predict(best.sigm,	newdata=test)
+      print(table(sigm.test,	test$class)	)
+      mean=mean(sigm.test==test$class)
       cat("\nMean of predicted values: ", mean)
    }
    
@@ -116,5 +131,8 @@
    
    # radial function
    rad_svm(t$train,t$test)
-
    
+   # sigmoid function
+   sigmoid_svm(t$train,t$test)
+
+ 
